@@ -22,11 +22,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.ccache
-          key: ccache-${{ github.sha }}
-          restore-keys: |
-            ccache-${{ github.sha }}
+              path: ~/.ccache
+              key: ccache-${{ runner.os }}-${{ github.sha }}
+              restore-keys: |
+                  ccache-${{ runner.os }}-${{ github.sha }}
+                  ccache-${{ runner.os }}-
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
