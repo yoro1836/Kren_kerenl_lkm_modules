@@ -64,8 +64,13 @@ jobs:
         working-directory: kernel_source
         run: |
           cp arch/arm64/configs/kren_defconfig .config
-          export ARCH=arm64
-          make kren_defconfig
+           make \
+            ARCH=arm64 \
+            LLVM=1 \
+            LLVM_IAS=1 \
+            CROSS_COMPILE=aarch64-linux-gnu- \
+            CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+            kren_defconfig
           make headers_install
           make modules_prepare
 
