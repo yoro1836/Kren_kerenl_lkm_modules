@@ -63,7 +63,7 @@ jobs:
         shell: bash
         working-directory: kernel_source
         run: |
-          cp kernel_source/arch/arm64/configs/kren_defconfig .config
+          cp arch/arm64/configs/kren_defconfig .config
           make oldconfig
           make headers_install
           make modules_prepare
