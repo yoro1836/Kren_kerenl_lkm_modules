@@ -9,14 +9,14 @@ jobs:
 
     steps:
       - name: Checkout kernel source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: yoro1836/Kren_kernel
           ref: S908EXXUBEXK5
           path: kernel_source
 
       - name: Checkout module source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: lwfinger/rtw88
           path: module_source
@@ -49,7 +49,7 @@ jobs:
           make -j$(nproc) -C /lib/modules/5.10.234-kren/build M=$(pwd) modules
 
       - name: Upload LKM module artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rtw88.ko
           path: module_source/rtw88.ko
