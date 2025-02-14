@@ -26,7 +26,7 @@ jobs:
             ~/.ccache
           key: ccache-${{ github.sha }}
           restore-keys: |
-            ccache-
+            ccache-${{ github.sha }}
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
