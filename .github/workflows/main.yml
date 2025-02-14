@@ -72,7 +72,7 @@ jobs:
             CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
             LD=ld.lld \
             AR=ar \
-            kren_defconfig
+            olddefconfig
           make headers_install
           make modules_prepare
 
