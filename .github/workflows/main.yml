@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev
+          sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev lld
           sudo apt-get install -y ccache
           echo " " >> ~/.bashrc
           echo "export USE_CCACHE=1" >> ~/.bashrc
@@ -58,9 +58,6 @@ jobs:
           export PATH=$PATH:$(pwd)/toolchain/bin
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          cd $WORKDIR
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gas/linux-x86 -b main binutils
-          export PATH="$WORKDIR/binutils:$PATH"
 
       - name: Prepare kernel headers and build directory
         shell: bash
