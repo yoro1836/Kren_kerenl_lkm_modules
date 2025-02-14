@@ -54,7 +54,7 @@ jobs:
           ccache -s
           wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
           mkdir toolchain
-          tar -xJf toolchain.tar.gz -C toolchain
+          tar -xzf toolchain.tar.gz -C toolchain
           export PATH=$PATH:$(pwd)/toolchain/bin
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
