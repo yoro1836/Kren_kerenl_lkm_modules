@@ -64,7 +64,7 @@ jobs:
         working-directory: kernel_source
         run: |
           cp arch/arm64/configs/kren_defconfig .config
-          echo "CONFIG_KBUILD_INTERACTIVE=n" >> .config
+          ./scripts/config --set-val CONFIG_OPTION y
           set -x
           make olddefconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
           make headers_install
