@@ -63,17 +63,17 @@ jobs:
         shell: bash
         working-directory: kernel_source
         run: |
-          export KBUILD_OUTPUT=/home/build
-          make kren_defconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
+          export KBUILD_OUTPUT=/home/builds
+          sudo make kren_defconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
           set -x
-          make oldconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
-          make headers_install
-          make modules_prepare
+          sudo make oldconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
+          sudo make headers_install
+          sudo make modules_prepare
       - name: Compile LKM module
         shell: bash
         working-directory: module_source
         run: |
-          make -j$(nproc) -C /home/builds M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
+          sudo make -j$(nproc) -C /home/builds M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
 
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
