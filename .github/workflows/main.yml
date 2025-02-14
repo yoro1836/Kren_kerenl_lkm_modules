@@ -1,0 +1,66 @@
+name: Build LKM Module
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest # workflow 실행 환경: Ubuntu 최신 버전
+
+    steps:
+      - name: Checkout kernel source code # 커널 소스 코드 checkout
+        uses: actions/checkout@v3
+        with:
+          repository: https://github.com/yoro1836/Kren_kernel
+          ref: S908EXXUBEXK5
+          path: kernel_source # checkout 디렉토리: kernel_source
+
+      - name: Checkout module source code # 모듈 소스 코드 checkout (rtw88 드라이버 예시)
+        uses: actions/checkout@v3
+        with:
+          repository: https://github.com/lwfinger/rtw88 **[필수]** 사용자 모듈 소스 코드 repository 주소로 변경 (예: user/rtw88-driver)
+          path: module_source # checkout 디렉토리: module_source
+
+      - name: Set up build environment # 빌드 환경 설정
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev
+          wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.xz # 예: https://developer.arm.com/.../gnu-aarch64-toolchain.tar.xz
+          mkdir toolchain
+          tar -xJf toolchain.tar.xz -C toolchain
+          export PATH=$PATH:$(pwd)/toolchain/bin
+          export ARCH=arm64 # **[필수]** 타겟 아키텍처로 변경 (arm 또는 arm64)
+          export CROSS_COMPILE=aarch64-linux-gnu- # **[필수]** 툴체인 접두사로 변경 (arm-linux-gnueabi- 또는 aarch64-linux-android-)
+
+      - name: Prepare kernel headers and build directory # 커널 헤더 및 빌드 디렉토리 준비
+        shell: bash
+        working-directory: kernel_source # 작업 디렉토리: kernel_source (커널 소스 코드)
+        run: |
+          # 1. .config 파일 복사 (workflow secrets 에 저장된 경우 예시)
+          # echo "$CONFIG_FILE_CONTENT" > .config
+          # **또는**  repository 에 .config 파일이 있는 경우 복사
+          cp kernel_source/arch/arm64/configs/kren_defconfig .config  # **[필수]** 사용자 .config 파일 경로로 변경 (예: kernel_source/arch/arm64/configs/your_defconfig)
+
+          # 2. 기존 설정 기반으로 설정 업데이트 (필요한 경우)
+          make oldconfig
+
+          # 3. 커널 헤더 파일 컴파일 (usr/include 에 설치)
+          make headers_install
+
+          # 4. 외부 모듈 빌드 디렉토리 준비 (/lib/modules/$(uname -r)/build)
+          make modules_prepare
+
+      - name: Compile LKM module # LKM 모듈 컴파일 (rtw88 드라이버 예시)
+        shell: bash
+        working-directory: module_source # 작업 디렉토리: module_source (모듈 소스 코드)
+        run: |
+          # make 명령어 실행, KERNEL_DIR 변수가 /lib/modules/$(uname -r)/build 를 가리키도록 Makefile 에 설정
+          make -j$(nproc) -C /lib/modules/5.10.234-kren/build M=$(pwd) modules # **[필수]** 커널 버전에 맞게 경로 변경 (5.10.234-TP_KERNEL 예시)
+
+      - name: Upload LKM module artifact # LKM 모듈 artifact 업로드
+        uses: actions/upload-artifact@v3
+        with:
+          name: rtw88.ko # artifact 이름
+          path: module_source/rtw88.ko # **[필수]** 컴파일된 모듈 파일 경로 (Makefile 출력 경로 확인)
+
