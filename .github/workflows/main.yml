@@ -66,9 +66,9 @@ jobs:
           cp arch/arm64/configs/kren_defconfig .config
           echo "CONFIG_KBUILD_INTERACTIVE=n" >> .config
           set -x
-          yes "" | make olddefconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
-          yes "" | make headers_install
-          yes "" | make modules_prepare
+          make olddefconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip
+          make headers_install
+          make modules_prepare
       - name: Compile LKM module
         shell: bash
         working-directory: module_source
