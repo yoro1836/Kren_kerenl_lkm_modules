@@ -64,7 +64,7 @@ jobs:
         working-directory: kernel_source
         run: |
           export KBUILD_OUTPUT=/home/builds
-          sudo make kren_defconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+          sudo cp arch/arm64/configs/kren_defconfig .config
           set -x
           export KCONFIG_OUTPUT=/home/suiya
           yes "" | sudo make oldconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
