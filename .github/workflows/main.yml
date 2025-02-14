@@ -12,7 +12,7 @@ jobs:
         shell: bash
         run: |
           sudo swapoff -a
-          sudo fallocate -c 1G /swapfile
+          sudo fallocate -l 10G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
@@ -50,7 +50,7 @@ jobs:
           echo " " >> ~/.bashrc
           echo "export USE_CCACHE=1" >> ~/.bashrc
           source ~/.bashrc
-          ccache -M 50G
+          ccache -M 5G
           ccache -s
           wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
           mkdir toolchain
