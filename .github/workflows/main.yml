@@ -58,8 +58,8 @@ jobs:
           export PATH=$PATH:$(pwd)/toolchain/bin
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gas/linux-x86 -b main binutils
-          export PATH="$WORKDIR/clang_toolchain/bin:$WORKDIR/binutils:$PATH"
+          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gas/linux-x86 -b main $WORKDIR/binutils
+          export PATH="$WORKDIR/binutils:$PATH"
 
       - name: Prepare kernel headers and build directory
         shell: bash
