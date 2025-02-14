@@ -65,8 +65,8 @@ jobs:
         run: |
           cp arch/arm64/configs/kren_defconfig .config
           yes '' | make oldconfig ARCH=arm64 LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- AR=ar
-          make headers_install
-          make modules_prepare
+          make headers_install ARCH=arm64 LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- AR=ar
+          make modules_prepare ARCH=arm64 LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- AR=ar
 
       - name: Compile LKM module
         shell: bash
