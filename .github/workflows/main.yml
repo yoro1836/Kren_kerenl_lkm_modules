@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev
+          sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev llvm
           sudo apt-get install -y ccache
           echo " " >> ~/.bashrc
           echo "export USE_CCACHE=1" >> ~/.bashrc
