@@ -72,7 +72,7 @@ jobs:
         shell: bash
         working-directory: module_source
         run: |
-          make -j$(nproc) -C /lib/modules/5.10.234-Kren/build M=$(pwd) modules
+          make -j$(nproc) -C /lib/modules/5.10.234-Kren/build M=$(pwd) modules ARCH=arm64 LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_COMPAT=arm-linux-gnueabi- AR=ar
 
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
