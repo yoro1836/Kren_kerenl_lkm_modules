@@ -8,6 +8,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up swap
+        shell: bash
+        run: |
+          sudo swapoff -a
+          sudo fallocate -c 1G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          sudo swapon -s
+          free -h
+
+      - name: Set up ccache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ccache
+          key: ccache-${{ github.sha }}
+          restore-keys: |
+            ccache-
+
       - name: Checkout kernel source code
         uses: actions/checkout@v4
         with:
@@ -26,9 +46,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev
-          wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.xz
+          sudo apt-get install -y ccache
+          echo " " >> ~/.bashrc
+          echo "export USE_CCACHE=1" >> ~/.bashrc
+          source ~/.bashrc
+          ccache -M 50G
+          ccache -s
+          wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
           mkdir toolchain
-          tar -xJf toolchain.tar.xz -C toolchain
+          tar -xJf toolchain.tar.gz -C toolchain
           export PATH=$PATH:$(pwd)/toolchain/bin
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
