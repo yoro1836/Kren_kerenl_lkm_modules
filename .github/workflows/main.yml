@@ -73,9 +73,10 @@ jobs:
           make ARCH=arm64 distclean
 
           ls -al
-
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
-          kren_defconfig
+          
+          run: |
+            make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+            kren_defconfig
 
           ls -al
 
