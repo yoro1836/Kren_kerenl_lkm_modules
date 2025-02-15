@@ -22,11 +22,11 @@ jobs:
       - name: Set up ccache
         uses: actions/cache@v4
         with:
-              path: ~/.ccache
-              key: ccache-${{ runner.os }}-${{ github.sha }}
-              restore-keys: |
-                  ccache-${{ runner.os }}-${{ github.sha }}
-                  ccache-${{ runner.os }}-
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ github.sha }}
+            ccache-${{ runner.os }}-
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
@@ -49,6 +49,9 @@ jobs:
           sudo apt-get install -y ccache
           echo " " >> ~/.bashrc
           echo "export USE_CCACHE=1" >> ~/.bashrc
+          echo "export PATH=$PATH:$(pwd)/toolchain/bin" >> ~/.bashrc
+          echo "export ARCH=arm64" >> ~/.bashrc
+          echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> ~/.bashrc
           source ~/.bashrc
           ccache -M 5G
           ccache -s
@@ -63,19 +66,32 @@ jobs:
         shell: bash
         working-directory: kernel_source
         run: |
-          export KBUILD_OUTPUT=/home/builds
-          sudo cp arch/arm64/configs/kren_defconfig .config
-          set -x
-          export KCONFIG_OUTPUT=/home/suiya
-          sudo make oldconfig ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
-          sudo make prepare ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
-          sudo make scripts ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
-          sudo make modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+          export KBUILD_OUTPUT=build_output
+          export INSTALL_HDR_PATH=header_install
+
+          mkdir -p $KBUILD_OUTPUT
+          mkdir -p $INSTALL_HDR_PATH
+
+          source ~/.bashrc
+          make clean
+
+          cp arch/arm64/configs/kren_defconfig .config
+
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
+
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          prepare O=./$KBUILD_OUTPUT
+
+
       - name: Compile LKM module
         shell: bash
         working-directory: module_source
         run: |
-          sudo make -j$(nproc) -C /home/suiya M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+          source ~/.bashrc
+          export KBUILD_OUTPUT=../kernel_source/build_output
+          sudo make -j$(nproc) -C ../kernel_source/$KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+
 
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
