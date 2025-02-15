@@ -20,9 +20,6 @@ jobs:
           sudo swapon -s
           free -h
 
-      #- name: Set up ccache (disabled temporarily)
-        # uses: actions/cache@v4 ... (ccache config commented out)
-
       - name: Checkout kernel source code
         uses: actions/checkout@v4
         with:
@@ -59,7 +56,7 @@ jobs:
         shell: bash
         working-directory: kernel_source
         run: |
-          export KBUILD_OUTPUT=build_output
+          export KBUILD_OUTPUT=$GITHUB_WORKSPACE/kernel_source/build_output
           export INSTALL_HDR_PATH=header_install
           export KCONFIG_CONFIG=.config
 
@@ -75,31 +72,31 @@ jobs:
           mrproper
 
           ls -al
-          
+
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           kren_defconfig
 
           ls -al
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           oldconfig
-          
+
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
 
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
-          prepare O=./$KBUILD_OUTPUT
-
+          prepare O=$KBUILD_OUTPUT
 
       - name: Compile LKM module
         shell: bash
         working-directory: module_source
         run: |
           source ~/.bashrc
-          export KBUILD_OUTPUT=../kernel_source/build_output
+          export KBUILD_OUTPUT=$GITHUB_WORKSPACE/kernel_source/build_output
+
           pwd
           ls -al $KBUILD_OUTPUT
-          make -j$(nproc) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
+          make -j$(nproc) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
