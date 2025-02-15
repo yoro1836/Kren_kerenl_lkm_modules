@@ -105,5 +105,5 @@ jobs:
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rtw88.ko
-          path: module_source/rtw88.ko
+          name: lkm_module
+          path: kernel_source/module_source/*.ko
