@@ -85,6 +85,8 @@ jobs:
 
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           prepare O=$KBUILD_OUTPUT
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE" # 워크스페이스 경로 출력
+          tree -L 2 # 디렉토리 구조 확인
 
       - name: Compile LKM module
         shell: bash
