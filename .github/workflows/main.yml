@@ -87,6 +87,9 @@ jobs:
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
 
           make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          prepare O=$KBUILD_OUTPUT
+
+          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           modules O=$KBUILD_OUTPUT
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE" # 워크스페이스 경로 출력
           tree -L 2 # 디렉토리 구조 확인
@@ -107,4 +110,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lkm_module
-          path: kernel_source/module_source/*.ko
+          path: module_source/*.ko
