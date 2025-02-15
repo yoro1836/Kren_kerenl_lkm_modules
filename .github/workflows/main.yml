@@ -73,9 +73,10 @@ jobs:
           mkdir -p $INSTALL_HDR_PATH
 
           source ~/.bashrc
-          make clean
+          make ARCH=arm64 mrproper
 
           cp arch/arm64/configs/kren_defconfig .config
+          ./scripts/config --set-val CONFIG_KBUILD_INTERACTIVE n
 
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
@@ -89,7 +90,7 @@ jobs:
         working-directory: module_source
         run: |
           source ~/.bashrc
-          export KBUILD_OUTPUT=../kernel_source/build_output
+          export KBUILD_OUTPUT=../kernel_source/build_output # point to the output directory relative to module source
           sudo make -j$(nproc) -C ../kernel_source/$KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
 
