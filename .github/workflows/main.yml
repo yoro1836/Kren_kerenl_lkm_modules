@@ -2,7 +2,6 @@ name: Build LKM Module
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   build:
@@ -20,14 +19,8 @@ jobs:
           sudo swapon -s
           free -h
 
-      - name: Set up ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: ccache-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            ccache-${{ runner.os }}-${{ github.sha }}
-            ccache-${{ runner.os }}-
+      - name: Set up ccache (disabled temporarily)
+        # uses: actions/cache@v4 ... (ccache config commented out)
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
@@ -49,13 +42,11 @@ jobs:
           sudo apt-get install -y build-essential libncurses-dev bison flex openssl libssl-dev dkms libelf-dev libudev-dev libpci-dev llvm lld
           sudo apt-get install -y ccache
           echo " " >> ~/.bashrc
-          echo "export USE_CCACHE=1" >> ~/.bashrc
+          echo "export USE_CCACHE=0" >> ~/.bashrc
           echo "export PATH=$PATH:$(pwd)/toolchain/bin" >> ~/.bashrc
           echo "export ARCH=arm64" >> ~/.bashrc
           echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> ~/.bashrc
           source ~/.bashrc
-          ccache -M 5G
-          ccache -s
           wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
           mkdir toolchain
           tar -xzf toolchain.tar.gz -C toolchain
@@ -69,15 +60,25 @@ jobs:
         run: |
           export KBUILD_OUTPUT=build_output
           export INSTALL_HDR_PATH=header_install
-          set -x
+          export KCONFIG_CONFIG=.config
 
           mkdir -p $KBUILD_OUTPUT
           mkdir -p $INSTALL_HDR_PATH
 
           source ~/.bashrc
-          make ARCH=arm64 mrproper
 
-          cp arch/arm64/configs/kren_defconfig .config
+          rm -rf $KBUILD_OUTPUT
+          rm -f .config
+
+          make ARCH=arm64 distclean
+
+          ls -al
+
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          kren_defconfig
+
+          ls -al
+
           ./scripts/config --set-val CONFIG_KBUILD_INTERACTIVE n
 
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
@@ -92,7 +93,7 @@ jobs:
         working-directory: module_source
         run: |
           source ~/.bashrc
-          export KBUILD_OUTPUT=../kernel_source/build_output # point to the output directory relative to module source
+          export KBUILD_OUTPUT=../kernel_source/build_output
           sudo make -j$(nproc) -C ../kernel_source/$KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
 
