@@ -7,18 +7,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Set up swap
-        shell: bash
-        run: |
-          sudo swapoff -a
-          sudo fallocate -l 10G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
-          sudo swapon -s
-          free -h
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@main
+        with:
+            key: lkm-build
+            append-timestamp: false
+            max-size: 10G
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
