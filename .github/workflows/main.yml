@@ -68,6 +68,7 @@ jobs:
         run: |
           export KBUILD_OUTPUT=build_output
           export INSTALL_HDR_PATH=header_install
+          set -x
 
           mkdir -p $KBUILD_OUTPUT
           mkdir -p $INSTALL_HDR_PATH
