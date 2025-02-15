@@ -31,7 +31,7 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@main
         with:
-          key: kren-lkm
+          key: ${{ github.job }}-${{ matrix.os }}
           max-size: 10G
           append-timestamp: false
 
