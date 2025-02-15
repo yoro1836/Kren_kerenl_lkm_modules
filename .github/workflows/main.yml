@@ -80,7 +80,9 @@ jobs:
           kren_defconfig
 
           ls -al
-
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          oldconfig
+          
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
 
