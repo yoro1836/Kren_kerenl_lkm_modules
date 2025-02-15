@@ -9,17 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 12
-
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@main
-        with:
-            key: lkm-build
-            append-timestamp: false
-            max-size: 10G
 
       - name: Checkout kernel source code
         uses: actions/checkout@v4
@@ -33,6 +22,18 @@ jobs:
         with:
           repository: lwfinger/rtw88
           path: module_source
+
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@main
+        with:
+          key: kren-lkm
+          max-size: 10G
+          append-timestamp: false
 
       - name: Set up build environment
         shell: bash
@@ -74,17 +75,17 @@ jobs:
 
           ls -al
 
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           kren_defconfig
 
           ls -al
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           oldconfig
 
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
 
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
+          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           modules O=$KBUILD_OUTPUT
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE" # 워크스페이스 경로 출력
           tree -L 2 # 디렉토리 구조 확인
@@ -99,7 +100,7 @@ jobs:
           pwd
           ls -al $KBUILD_OUTPUT
 
-          make -j$(nproc) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+          make -j$(nproc --all) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
       - name: Upload LKM module artifact
         uses: actions/upload-artifact@v4
