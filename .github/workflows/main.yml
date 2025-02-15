@@ -94,6 +94,7 @@ jobs:
         working-directory: module_source
         run: |
           source ~/.bashrc
+          echo "아니 이거 왜않되"
           export KBUILD_OUTPUT=../kernel_source/build_output
           make -j$(nproc) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
