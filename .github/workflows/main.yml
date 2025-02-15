@@ -28,17 +28,13 @@ jobs:
         with:
           swap-size-gb: 12
 
-      - name: Setup CCache
-        id: cache
-        uses: actions/cache@v4
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@main
         with:
-          path: |
-            /home/runner/.ccache
-          key: ${{ runner.os }}-build-ccache
-          restore-keys: |
-            ccache
-            ${{ runner.os }}-build-ccache
-
+            key: lkm-build
+            append-timestamp: false
+            max-size: 6G
+          
       - name: Set up build environment
         shell: bash
         run: |
@@ -62,6 +58,7 @@ jobs:
         shell: bash
         working-directory: kernel_source
         run: |
+          export PATH="/home/runner/.ccache:$PATH"
           export KBUILD_OUTPUT=$GITHUB_WORKSPACE/kernel_source/build_output
           export INSTALL_HDR_PATH=header_install
           export KCONFIG_CONFIG=.config
