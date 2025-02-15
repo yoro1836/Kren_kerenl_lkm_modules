@@ -96,7 +96,8 @@ jobs:
         run: |
           source ~/.bashrc
           export KBUILD_OUTPUT=../kernel_source/build_output
-          make -j$(nproc) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
+          ls -al
+          make -j$(nproc) -C ../kernel_source/$KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
 
       - name: Upload LKM module artifact
