@@ -47,7 +47,7 @@ jobs:
           echo "export ARCH=arm64" >> ~/.bashrc
           echo "export CROSS_COMPILE=aarch64-linux-gnu-" >> ~/.bashrc
           source ~/.bashrc
-          wget https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
+          wget -q https://github.com/ZyCromerZ/Clang/releases/download/12.0.1-20230207-release/Clang-12.0.1-20230207.tar.gz -O toolchain.tar.gz
           mkdir toolchain
           tar -xzf toolchain.tar.gz -C toolchain
           export PATH=$PATH:$(pwd)/toolchain/bin
@@ -68,20 +68,8 @@ jobs:
 
           source ~/.bashrc
 
-          rm -rf $KBUILD_OUTPUT
-          rm -f .config
-
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
-          mrproper
-
-          ls -al
-
           make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           kren_defconfig
-
-          ls -al
-          make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
-          oldconfig
 
           make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           headers_install INSTALL_HDR_PATH=./$INSTALL_HDR_PATH
@@ -91,8 +79,6 @@ jobs:
 
           make -j$(nproc --all) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang \
           modules O=$KBUILD_OUTPUT
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE" # 워크스페이스 경로 출력
-          tree -L 2 # 디렉토리 구조 확인
 
       - name: Compile LKM module
         shell: bash
@@ -100,9 +86,6 @@ jobs:
         run: |
           source ~/.bashrc
           export KBUILD_OUTPUT=$GITHUB_WORKSPACE/kernel_source/build_output
-
-          pwd
-          ls -al $KBUILD_OUTPUT
 
           make -j$(nproc --all) -C $KBUILD_OUTPUT M=$(pwd) modules ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 LLVM_IAS=1 DEPMOD=depmod DTC=dtc HOSTCC=clang HOSTCXX=clang++ CC=clang
 
