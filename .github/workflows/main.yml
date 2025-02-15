@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup CCache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             /home/runner/.ccache
