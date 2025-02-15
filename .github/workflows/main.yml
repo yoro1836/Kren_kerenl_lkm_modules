@@ -19,7 +19,7 @@ jobs:
           sudo swapon -s
           free -h
 
-      - name: Set up ccache (disabled temporarily)
+      #- name: Set up ccache (disabled temporarily)
         # uses: actions/cache@v4 ... (ccache config commented out)
 
       - name: Checkout kernel source code
